@@ -1,0 +1,53 @@
+
+
+
+
+#include <dht11.h>
+int RelayPin=7;
+int smokepin = A1;
+int soilpin = A3;
+int dht11pin = 5;
+int smoke;
+int soil;
+int chk;
+int temp;
+int hum;
+bool pumpShouldRun = false;
+dht11 DHT11;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(smokepin, INPUT);
+  pinMode(soilpin, INPUT);
+  pinMode(dht11pin, INPUT);
+  pinMode(RelayPin, OUTPUT);
+  digitalWrite(RelayPin, HIGH);
+   // put your setup code here, to run once:
+}
+
+void loop() {
+
+   pumpShouldRun = false;
+   if (Serial.available() > 0) {
+    String payload = Serial.readString();
+    payload.trim();
+    if (payload.equals("water")) {
+      pumpShouldRun = true;
+    }
+  }
+
+   if (pumpShouldRun) {
+    digitalWrite(RelayPin, LOW);
+  } else {
+    digitalWrite(RelayPin, HIGH);
+  }
+  smoke = analogRead(smokepin);
+  soil = analogRead(soilpin); 
+  chk = DHT11.read(dht11pin);
+  temp=DHT11.temperature;
+  hum=DHT11.humidity;
+  String a="";
+  a=a+temp+"|"+hum+"|"+soil+"|"+smoke;
+  Serial.println(a);
+  delay(10000);
+}
